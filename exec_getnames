@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#First compile the java
+javac -cp "./:/Users/annaturner/Desktop/temp/stanford-corenlp-full-2015-01-30/*" getNames.java
+
+#Then execute it
+java -cp "./:/Users/annaturner/Desktop/temp/stanford-corenlp-full-2015-01-30/*" getNames
