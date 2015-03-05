@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="/Users/annaturner/Desktop/temp/stanford-corenlp-full-2015-01-30/stanford-corenlp-3.5.1-models.jar"/>
+	<classpathentry kind="lib" path="/Users/annaturner/Desktop/temp/stanford-corenlp-full-2015-01-30/ejml-0.23.jar"/>
+	<classpathentry kind="lib" path="/Users/annaturner/Desktop/temp/stanford-corenlp-full-2015-01-30/joda-time.jar"/>
+	<classpathentry kind="lib" path="/Users/annaturner/Desktop/temp/stanford-corenlp-full-2015-01-30/jollyday.jar"/>
+	<classpathentry kind="lib" path="/Users/annaturner/Desktop/temp/stanford-corenlp-full-2015-01-30/stanford-corenlp-3.5.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
