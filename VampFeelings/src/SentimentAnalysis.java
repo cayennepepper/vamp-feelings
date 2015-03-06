@@ -4,6 +4,7 @@ import java.util.*;
 
 import edu.stanford.nlp.io.*;
 import edu.stanford.nlp.ling.*;
+import edu.stanford.nlp.ling.CoreAnnotations.*;
 import edu.stanford.nlp.pipeline.*;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.util.*;
@@ -27,7 +28,7 @@ public class SentimentAnalysis {
 	}
 	
 	public static void main(String[] args) {
-		//We take a file
+		//FILE READIN
 		String filePath = "../../text_snippets/dracula_2_page.txt";
 		String content = new String();
 		try {
@@ -36,10 +37,27 @@ public class SentimentAnalysis {
 			e.printStackTrace();
 		}
 		
-		//Then we want to grab all the mentions of named entities in the text.
+		
+		//PIPELINE
+		//Creates a StanfordCoreNLP object, with POS tagging, lemmatization, 
+		//NER, parsing, and coreference resolution 
+	     Properties props = new Properties();
+//	     props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+	     props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
+	     StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+	     
+	     
+	     //ANNOTATION
+	     Annotation document = new Annotation(content);
+		 pipeline.annotate(document);
 
+	     
+		 //Get a NamedEntity Parser and grab the dictionary of name-> mention list
+		 NamedEntities nameGrabber = new NamedEntities(document);
+		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> nameIndex = nameGrabber.getNamedEntities();
+
+		 
 		
 		
 	}
-
 }
