@@ -22,12 +22,16 @@ public class NamedEntities {
 	private HashMap<String, ArrayList<Tuple<Integer, Integer>>> nameIndex = 
 			new  HashMap<String, ArrayList<Tuple<Integer, Integer>>>();//Maps from names to 
 																	//Pairs of integers listing loc
+	private HashMap<String, String> indexToName = 
+			new HashMap<String, String>(); //Maps from location index pair to name
+																		//Useful in the anaphora resolution phase
 	public NamedEntities(Annotation annotatedDoc) {
 		this.doc = annotatedDoc;
 	}
 	
 	//Takes in an ANNOTATED DOCUMENT. ALREADY HAS TO GO THROUGH PIPELINE
-	public HashMap<String, ArrayList<Tuple<Integer, Integer>>> getNamedEntities(){
+	public Tuple<HashMap<String, ArrayList<Tuple<Integer, Integer>>>, HashMap<String, String>>
+	getNamedEntities(){
 		//NER
 		// A CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
@@ -42,19 +46,26 @@ public class NamedEntities {
 	    			Integer beginIndex = token.get(CharacterOffsetBeginAnnotation.class);
 	    			Integer endIndex = token.get(CharacterOffsetEndAnnotation.class);
 	        	 
+	    			//Insert into name->index hashmap
 	    			if(nameIndex.containsKey(person)) {
 	    				ArrayList<Tuple<Integer, Integer>> tempList = nameIndex.get(person);
 	    				tempList.add(new Tuple(beginIndex, endIndex));
 	    				nameIndex.put(person, tempList);
 	    			} else {
-	    				nameIndex.put(person, new ArrayList<Tuple<Integer, Integer>>());
+	    				ArrayList<Tuple<Integer, Integer>> tempList = new ArrayList<Tuple<Integer, Integer>>();
+	    				tempList.add(new Tuple(beginIndex, endIndex));
+	    				nameIndex.put(person, tempList);
 	    			}
-//	    			System.out.println("Person: " + person + " begin: " + beginIndex + " end: "+ endIndex);
+	    			
+	    			//Also insert into index->name hashmap
+	    			String newTupleName = (new Tuple(beginIndex, endIndex)).toString();
+	    			indexToName.put(newTupleName, person);
 	    		}
 	       }
 	    }
 	    
 	    //Print out everything.
+	    System.out.println("THIS IS THE ORIGINAL NAME SET...");
 	    for (String personName : nameIndex.keySet()){
 	    	//Get the list of mentions
 	    	ArrayList<Tuple<Integer, Integer>> mentionList = nameIndex.get(personName);
@@ -62,7 +73,7 @@ public class NamedEntities {
 	    	System.out.println("Person: " + personName + " Mention List: " + val);
 	    }
 	    
-	    return nameIndex;
+	    return new Tuple(nameIndex, indexToName);
 	
 	}
 }

@@ -38,12 +38,14 @@ public class SentimentAnalysis {
 		}
 		
 		
+		
 		//PIPELINE
 		//Creates a StanfordCoreNLP object, with POS tagging, lemmatization, 
 		//NER, parsing, and coreference resolution 
 	     Properties props = new Properties();
-//	     props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
-	     props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
+	     props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+//	     props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
+	     props.setProperty("dcoref.maxdist", "-1");
 	     StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 	     
 	     
@@ -54,9 +56,16 @@ public class SentimentAnalysis {
 	     
 		 //Get a NamedEntity Parser and grab the dictionary of name-> mention list
 		 NamedEntities nameGrabber = new NamedEntities(document);
-		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> nameIndex = nameGrabber.getNamedEntities();
-
+		 Tuple<HashMap<String, ArrayList<Tuple<Integer, Integer>>>,
+		 		HashMap<String, String>> namedEntitiesTuple = nameGrabber.getNamedEntities();
+		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> nameIndex = namedEntitiesTuple.x;
+		 HashMap<String, String> indexToName = namedEntitiesTuple.y;
 		 
+		 
+		 //Get an Anaphora Resolver and update the named entity thing
+		 AnaphoraResolution resolver = new AnaphoraResolution(document, nameIndex, indexToName);
+		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> anaphoraNameIndex = 
+				 resolver.getAnaphoraNameList();
 		
 		
 	}
