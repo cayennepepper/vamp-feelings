@@ -29,7 +29,7 @@ public class SentimentAnalysis {
 	
 	public static void main(String[] args) {
 		//FILE READIN
-		String filePath = "../../text_snippets/dracula_2_page.txt";
+		String filePath = "../../text_snippets/super_short_text.txt";
 		String content = new String();
 		try {
 			content = readFile(filePath, StandardCharsets.UTF_8);
@@ -56,14 +56,18 @@ public class SentimentAnalysis {
 	     
 		 //Get a NamedEntity Parser and grab the dictionary of name-> mention list
 		 NamedEntities nameGrabber = new NamedEntities(document);
-		 Tuple<HashMap<String, ArrayList<Tuple<Integer, Integer>>>,
-		 		HashMap<String, String>> namedEntitiesTuple = nameGrabber.getNamedEntities();
-		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> nameIndex = namedEntitiesTuple.x;
-		 HashMap<String, String> indexToName = namedEntitiesTuple.y;
+		 Tuple<
+		 	Tuple<
+		 		HashMap<String, ArrayList<Tuple<Integer, Integer>>>,
+		 		HashMap<String, String>>,
+		 		HashMap<String, Integer>>namedEntitiesTuple = nameGrabber.getNamedEntities();
+		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> nameIndex = namedEntitiesTuple.x.x;
+		 HashMap<String, String> indexToName = namedEntitiesTuple.x.y;
+		 HashMap<String, Integer> sentenceToIndex = namedEntitiesTuple.y;
 		 
 		 
 		 //Get an Anaphora Resolver and update the named entity thing
-		 AnaphoraResolution resolver = new AnaphoraResolution(document, nameIndex, indexToName);
+		 AnaphoraResolution resolver = new AnaphoraResolution(document, nameIndex, indexToName, sentenceToIndex);
 		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> anaphoraNameIndex = 
 				 resolver.getAnaphoraNameList();
 		

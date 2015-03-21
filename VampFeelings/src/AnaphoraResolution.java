@@ -26,14 +26,16 @@ public class AnaphoraResolution {
 	private Annotation doc;
 	private HashMap<String, ArrayList<Tuple<Integer, Integer>>> nameIndex;
 	private HashMap<String, String> indexToName;
+	private HashMap<String, Integer> indexToSentenceNum = new HashMap<String, Integer>();
 
 	public AnaphoraResolution(Annotation annotatedDoc, 
 			HashMap<String, ArrayList<Tuple<Integer, Integer>>> inputNameIndex,
-			HashMap<String, String> inputIndexToName) {
+			HashMap<String, String> inputIndexToName,
+			HashMap<String, Integer> sentence2Index) {
 		this.doc = annotatedDoc;
 		this.nameIndex = inputNameIndex;
 		this.indexToName = inputIndexToName;
-		
+		this.indexToSentenceNum = sentence2Index;
 	}
 	
 	public HashMap<String, ArrayList<Tuple<Integer, Integer>>> getAnaphoraNameList(){
@@ -53,11 +55,12 @@ public class AnaphoraResolution {
             //begin and end index is present in the hashmap. If so, add the index pair to the hashmap's
             //list and build up the mentions that way. I create a set of indices for the representative
             //mention and the other mentions to see if any of them match on any named entities.
-
-            Set<Tuple<Integer,Integer>> indexSet = new HashSet<Tuple<Integer,Integer>>();
+            //The third Integer is the sentence number
+            Set<Tuple<Tuple<Integer,Integer>, Integer>> indexSet = 
+            		new HashSet<Tuple<Tuple<Integer,Integer>, Integer>>();
             
             CorefMention cm = c.getRepresentativeMention();
-//            System.out.println("Here is a CorefMention: " + cm);
+            System.out.println("Here is a CorefMention: " + cm);
             Integer repMentionBeginInd = 0;
             Integer repMentionEndInd = 0;
             List<CoreLabel> tks = doc.get(SentencesAnnotation.class).get(cm.sentNum-1).get(TokensAnnotation.class);
@@ -76,9 +79,10 @@ public class AnaphoraResolution {
             
 
             for(CorefMention m : c.getMentionsInTextualOrder()){
-//                System.out.print(" And here is another mention: "+ m);
+                System.out.println(" And here is another mention: "+ m);
             	Integer bIndex = 0;
             	Integer eIndex = 0;
+            	Integer sNum = m.sentNum-1;
                 tks = doc.get(SentencesAnnotation.class).get(m.sentNum-1).get(TokensAnnotation.class);
                 for(int i = m.startIndex-1; i < m.endIndex-1; i++){
                 	Integer beginIndex = tks.get(i).get(CharacterOffsetBeginAnnotation.class);
@@ -88,16 +92,38 @@ public class AnaphoraResolution {
     				}
     				if (i == m.endIndex-2){
     					eIndex = endIndex;
-    					indexSet.add(new Tuple(bIndex,eIndex)); //Can add after we know end index.
+    					Tuple<Tuple<Integer,Integer>, Integer> newTup = 
+    							new Tuple((new Tuple(bIndex, eIndex)), sNum);
+    					indexSet.add(newTup); //Can add after we know end index.
+    					//Add to the index -> sentence number
+    					String tupToString = newTup.toString();
+    					
+    					//CANT DO THIS HERE - NEED TO ONLY ADD SENTENCE NUMS FOR PEOPLE
+//    					indexToSentenceNum.put(tupToString, m.sentNum-1);
     				}
                 }
-//                System.out.println(" whose indices are: " + bIndex + "," + eIndex);
             }
             //Now we check everything against the mentions. This involves seeing if the index in question
             //appears in the index->name hashmap. If it does, we grab the name from the name->index hashmap 
             //and update its value with the entire set of indices and then we break :)
             
+            //TEMP: printing everything in indexSet and indexToName
+//            System.out.println("Stuff in indexSet: ");
+//            for (Tuple<Tuple<Integer,Integer>, Integer> it : indexSet){
+//            	System.out.println(it);
+//            }
+//            System.out.println("Done with stuff in indexSet. Stuff in indexName: ");
+//            for (Tuple<Tuple<Integer,Integer>, Integer> name: example.keySet()){
+//
+//                String key =name.toString();
+//                String value = example.get(name).toString();  
+//                System.out.println(key + " " + value);  
+//            } 
+            
+            
             for(Tuple ind : indexSet){
+            	
+            	System.out.println("Tuple ind in indexSet: " + ind.toString());
             	
             	if(!indexToName.containsKey(ind.toString())){ //We hash on strings!
             		continue;
@@ -105,18 +131,33 @@ public class AnaphoraResolution {
         		String person = indexToName.get(ind.toString());
         		indexSet.remove(ind); //Get rid of repeat mention
 				ArrayList<Tuple<Integer, Integer>> tempList = nameIndex.get(person); //get already existing
-				ArrayList<Tuple<Integer,Integer>> setAsList = new ArrayList<Tuple<Integer,Integer>>(indexSet);
-				tempList.addAll(setAsList);
+				//Get the arraylist of tuple< tuple<beginIndex, endIndex>, sentenceNum and strip the indices.
+				//Those indices get put into nameIndex.
+				//Place the sentence numbers into indexToSentenceNum.
+				ArrayList<Tuple<Tuple<Integer,Integer>, Integer>> setAsList = 
+						new ArrayList<Tuple<Tuple<Integer,Integer>, Integer>>(indexSet);
+				for(Tuple<Tuple<Integer,Integer>, Integer> dubTup : setAsList){
+					System.out.println("Something matched yo");
+					Tuple<Integer,Integer> indexTup = dubTup.x;
+					Integer sentNum = dubTup.y;
+					tempList.add(indexTup);
+					indexToSentenceNum.put(indexTup.toString(), sentNum);
+
+				}
 				nameIndex.put(person, tempList);
 				break;
             }
             
         }
+        
+        //TODO is this a problem??
+        //Prune out everything that isn't around "vampire"
+        VampireChecker checker = new VampireChecker(this.doc, this.nameIndex, this.indexToSentenceNum);
+        nameIndex = checker.getNearVampires();        
 
         //Let's print all the crap!
-        System.out.println("\n\n\n\n\n NOW WE HAVE ANAPHORIZED..... \n\n\n\n\n");
-	    for (String personName : nameIndex.keySet()){
-	    	//Get the list of mentions
+        System.out.println("\n\n NOW WE HAVE ANAPHORIZED..... \n\n");
+	    for (String personName : nameIndex.keySet()){//Get the list of mentions
 	    	ArrayList<Tuple<Integer, Integer>> mentionList = nameIndex.get(personName);
 	    	String val = mentionList.toString();
 	    	System.out.println("Person: " + personName + " Mention List: " + val);

@@ -25,13 +25,20 @@ public class NamedEntities {
 	private HashMap<String, String> indexToName = 
 			new HashMap<String, String>(); //Maps from location index pair to name
 																		//Useful in the anaphora resolution phase
+	
+	private HashMap<String, Integer> nameToSentence =
+			new HashMap<String, Integer>();//Will use to grab the sentence indices for each word.
+	
 	public NamedEntities(Annotation annotatedDoc) {
 		this.doc = annotatedDoc;
 	}
 	
 	//Takes in an ANNOTATED DOCUMENT. ALREADY HAS TO GO THROUGH PIPELINE
-	public Tuple<HashMap<String, ArrayList<Tuple<Integer, Integer>>>, HashMap<String, String>>
+	public Tuple<
+				Tuple<HashMap<String, ArrayList<Tuple<Integer, Integer>>>, HashMap<String, String>>, 
+				HashMap<String,Integer>>
 	getNamedEntities(){
+		int sentenceNum = 0;
 		//NER
 		// A CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
@@ -40,6 +47,7 @@ public class NamedEntities {
 	    	// A CoreLabel is a CoreMap with additional token-specific methods
 	    	for (CoreLabel token: sentence.get(TokensAnnotation.class)) { 
 	    		//Check if this is a person. If so, place the appearance in the map.
+	    		
 	    		String ne = token.get(NamedEntityTagAnnotation.class);
 	    		if (ne.equals("PERSON")){
 	    			String person = token.get(TextAnnotation.class);
@@ -60,6 +68,10 @@ public class NamedEntities {
 	    			//Also insert into index->name hashmap
 	    			String newTupleName = (new Tuple(beginIndex, endIndex)).toString();
 	    			indexToName.put(newTupleName, person);
+	    			
+	    			//Also insert string-sentence number into hashmap
+	    			nameToSentence.put(newTupleName, new Integer(sentenceNum));
+	    			
 	    		}
 	       }
 	    }
@@ -73,7 +85,7 @@ public class NamedEntities {
 	    	System.out.println("Person: " + personName + " Mention List: " + val);
 	    }
 	    
-	    return new Tuple(nameIndex, indexToName);
+	    return new Tuple((new Tuple(nameIndex, indexToName)), nameToSentence);
 	
 	}
 }
