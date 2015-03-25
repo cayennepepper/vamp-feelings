@@ -68,8 +68,9 @@ public class SentimentAnalysis {
 		 
 		 //Get an Anaphora Resolver and update the named entity thing
 		 AnaphoraResolution resolver = new AnaphoraResolution(document, nameIndex, indexToName, sentenceToIndex);
-		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> anaphoraNameIndex = 
-				 resolver.getAnaphoraNameList();
+//		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> anaphoraNameIndex = 
+//				 resolver.getAnaphoraNameList();
+		 HashMap<Integer,Integer> sentenceCounts = resolver.getSentenceCounts();
 		
 		
 	}

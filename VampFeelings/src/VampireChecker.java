@@ -23,10 +23,10 @@ import java.nio.charset.StandardCharsets;
 //but it is a first pass.
 
 public class VampireChecker {
-	HashMap<String, ArrayList<Tuple<Integer, Integer>>> indexMap;
-	HashMap<String, Integer> indexToSentenceNum;
-
-	Annotation doc;
+	private HashMap<String, ArrayList<Tuple<Integer, Integer>>> indexMap;
+	private HashMap<String, Integer> indexToSentenceNum;
+	private Annotation doc;
+	private HashMap<Integer, Integer> sentenceNumToCount;
 
 	/**
 	 * 
@@ -40,16 +40,27 @@ public class VampireChecker {
 		this.doc = annotatedDoc;
 		this.indexMap = nameToIndices;
 		this.indexToSentenceNum = indToSentence;
+		this.sentenceNumToCount = new HashMap<Integer,Integer>();
 	}
 	
-	//This weeds out everything in nameToIndices that isn't near "vampire"
-	public HashMap<String, ArrayList<Tuple<Integer,Integer>>> getNearVampires(){
+	/*
+	 * This weeds out everything in nameToIndices that isn't near "vampire". It simultaneously
+	 * constructs a hashmap of Integer,Integer that will give the sentence numbers and the number
+	 * of times those words need to be evaluated.
+	 */
+//	public HashMap<String, ArrayList<Tuple<Integer,Integer>>> getNearVampires(){
+	public Tuple<HashMap<String, ArrayList<Tuple<Integer,Integer>>>,
+	HashMap<Integer,Integer>> getNearVampiresSCount(){
+
+		
+		
+		
 		//DEBUGGING
-		Iterator blah = indexToSentenceNum.entrySet().iterator();
-		while (blah.hasNext()){
-			Map.Entry<String, Integer> p = (Map.Entry)blah.next();
-			System.out.println("Index: " + p.getKey() + " and sentence number: " + p.getValue());
-		}
+//		Iterator blah = indexToSentenceNum.entrySet().iterator();
+//		while (blah.hasNext()){
+//			Map.Entry<String, Integer> p = (Map.Entry)blah.next();
+//			System.out.println("Index: " + p.getKey() + " and sentence number: " + p.getValue());
+//		}
 		
 		
 	    Iterator it = indexMap.entrySet().iterator();
@@ -58,34 +69,47 @@ public class VampireChecker {
 	        String mentionName = pair.getKey();
 	        ArrayList<Tuple<Integer,Integer>> indexMentions = pair.getValue(); 
 	        
-	        //Iterate over every mention and check to see if near vampire
+	        //Iterate over every mention and check to see if near vampire. Also construct set
+	        //to keep track of sentence numbers for a particular vampire mention (+ anaphoras)
+	        Set<Integer> uniqueSentenceNumbers = new HashSet<Integer>();
+	        
+	        
 	        Iterator indMenIt = indexMentions.iterator();
 	        while (indMenIt.hasNext()){
-	        	//The way I do this now: check each mapped sentence to see if contains "vampire"
-	        	//Might not be efficient
 	        	Tuple<Integer,Integer> toCheck = (Tuple<Integer,Integer>)(indMenIt.next());
-	        	System.out.println("Tuple to check: " + toCheck.toString());
-	        		
 	        	
-	        	
-	        	//TEMP: PRINTING OUT ALL OF INDEXTOSENTENCE NUM
-//	        	System.out.println("Here is indexToSentenceNum: ");
-//	        	for (String name: indexToSentenceNum.keySet()){
-//	                String value = indexToSentenceNum.get(name).toString();  
-//	                System.out.println(name + " " + value);  
-//	        	} 
-//	        	System.out.println("End indexToSentenceNum");
-	        	
-	        	
-	        	
-	        	//Get the sentence number. If not near vampire, remove index.
+	        	//Get the sentence number. If not near vampire, remove index both from NER hashmap
+	        	//and from sentence number hashmap.
 	        	Integer sentenceIndex = indexToSentenceNum.get(toCheck.toString());
 	        	if(!isNearVampire(sentenceIndex)){
 	        		indMenIt.remove();
+	        		indexToSentenceNum.remove(toCheck.toString());
+	        		continue;
 	        	}
+	        	uniqueSentenceNumbers.add(sentenceIndex);
+	        }
+	        
+	        //Update the counts for each sentence in the sentenceNumToCount hashmap
+	        for(Integer i: uniqueSentenceNumbers){
+		        if(!sentenceNumToCount.containsKey(i)){
+		        	sentenceNumToCount.put(i, new Integer(1));
+		        } else {
+		        	Integer oldCount = sentenceNumToCount.get(i);
+		        	sentenceNumToCount.put(i, oldCount+1);
+		        }
+
 	        }
 	    }
-	    return indexMap;
+//	    return indexMap;
+	    return new Tuple(indexMap, sentenceNumToCount);
+	}
+	
+	
+	/*
+	 * This takes indexMap and indexToSentenceNum. It goes 
+	 */
+	public HashMap<Integer,Integer> getSentenceCounts(){
+		return null;
 	}
 	
 	//This does the checking to see whether a word is within sentence containing "vampire"

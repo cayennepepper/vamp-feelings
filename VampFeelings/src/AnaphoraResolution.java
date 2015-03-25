@@ -38,7 +38,9 @@ public class AnaphoraResolution {
 		this.indexToSentenceNum = sentence2Index;
 	}
 	
-	public HashMap<String, ArrayList<Tuple<Integer, Integer>>> getAnaphoraNameList(){
+//	public HashMap<String, ArrayList<Tuple<Integer, Integer>>> getAnaphoraNameList(){
+	public HashMap<Integer,Integer> getSentenceCounts(){
+
 		//Get the coreference-resolved material from the nlp library
         Map<Integer, CorefChain> coref = doc.get(CorefChainAnnotation.class);
         
@@ -47,8 +49,9 @@ public class AnaphoraResolution {
             CorefChain c = entry.getValue();
 
             //Avoid those that are only self-references
-            if(c.getMentionsInTextualOrder() .size() <= 1)
+            if(c.getMentionsInTextualOrder() .size() <= 1){
                 continue;
+            }
 
             //Take representative mention and build up the phrase that marks it. Store the begin index
             //and the very last end index. Check for a match in nameIndex to see if that pair of 
@@ -60,7 +63,7 @@ public class AnaphoraResolution {
             		new HashSet<Tuple<Tuple<Integer,Integer>, Integer>>();
             
             CorefMention cm = c.getRepresentativeMention();
-            System.out.println("Here is a CorefMention: " + cm);
+//            System.out.println("Here is a CorefMention: " + cm);
             Integer repMentionBeginInd = 0;
             Integer repMentionEndInd = 0;
             List<CoreLabel> tks = doc.get(SentencesAnnotation.class).get(cm.sentNum-1).get(TokensAnnotation.class);
@@ -79,7 +82,7 @@ public class AnaphoraResolution {
             
 
             for(CorefMention m : c.getMentionsInTextualOrder()){
-                System.out.println(" And here is another mention: "+ m);
+//                System.out.println(" And here is another mention: "+ m);
             	Integer bIndex = 0;
             	Integer eIndex = 0;
             	Integer sNum = m.sentNum-1;
@@ -98,8 +101,6 @@ public class AnaphoraResolution {
     					//Add to the index -> sentence number
     					String tupToString = newTup.toString();
     					
-    					//CANT DO THIS HERE - NEED TO ONLY ADD SENTENCE NUMS FOR PEOPLE
-//    					indexToSentenceNum.put(tupToString, m.sentNum-1);
     				}
                 }
             }
@@ -121,14 +122,13 @@ public class AnaphoraResolution {
 //            } 
             
             
-            for(Tuple ind : indexSet){
-            	
-            	System.out.println("Tuple ind in indexSet: " + ind.toString());
-            	
-            	if(!indexToName.containsKey(ind.toString())){ //We hash on strings!
+            for(Tuple<Tuple<Integer,Integer>, Integer> ind : indexSet){
+            	Tuple<Integer,Integer> pruneTup = ind.x;
+            	            	
+            	if(!indexToName.containsKey(pruneTup.toString())){ //We hash on strings!
             		continue;
             	}
-        		String person = indexToName.get(ind.toString());
+        		String person = indexToName.get(pruneTup.toString());
         		indexSet.remove(ind); //Get rid of repeat mention
 				ArrayList<Tuple<Integer, Integer>> tempList = nameIndex.get(person); //get already existing
 				//Get the arraylist of tuple< tuple<beginIndex, endIndex>, sentenceNum and strip the indices.
@@ -137,7 +137,6 @@ public class AnaphoraResolution {
 				ArrayList<Tuple<Tuple<Integer,Integer>, Integer>> setAsList = 
 						new ArrayList<Tuple<Tuple<Integer,Integer>, Integer>>(indexSet);
 				for(Tuple<Tuple<Integer,Integer>, Integer> dubTup : setAsList){
-					System.out.println("Something matched yo");
 					Tuple<Integer,Integer> indexTup = dubTup.x;
 					Integer sentNum = dubTup.y;
 					tempList.add(indexTup);
@@ -153,16 +152,18 @@ public class AnaphoraResolution {
         //TODO is this a problem??
         //Prune out everything that isn't around "vampire"
         VampireChecker checker = new VampireChecker(this.doc, this.nameIndex, this.indexToSentenceNum);
-        nameIndex = checker.getNearVampires();        
+        HashMap<Integer,Integer> sentCount = checker.getNearVampiresSCount().y;
+        nameIndex = checker.getNearVampiresSCount().x;        
 
-        //Let's print all the crap!
-        System.out.println("\n\n NOW WE HAVE ANAPHORIZED..... \n\n");
-	    for (String personName : nameIndex.keySet()){//Get the list of mentions
-	    	ArrayList<Tuple<Integer, Integer>> mentionList = nameIndex.get(personName);
-	    	String val = mentionList.toString();
-	    	System.out.println("Person: " + personName + " Mention List: " + val);
-	    }
+//        //Let's print all the crap!
+//        System.out.println("\n\n NOW WE HAVE ANAPHORIZED..... \n\n");
+//	    for (String personName : nameIndex.keySet()){//Get the list of mentions
+//	    	ArrayList<Tuple<Integer, Integer>> mentionList = nameIndex.get(personName);
+//	    	String val = mentionList.toString();
+//	    	System.out.println("Person: " + personName + " Mention List: " + val);
+//	    }
 		
-		return nameIndex;
+//		return new Tuple(nameIndex, sentCount);
+        return sentCount;
 	}
 }
