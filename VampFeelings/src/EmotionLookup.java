@@ -27,43 +27,109 @@ import java.nio.charset.StandardCharsets;
  */
 
 public class EmotionLookup {
+	private Annotation doc;
 	private HashMap<Integer,Integer> sentenceCounts;
+	private HashMap<String,String> nrcLex;
 	
 	
 	
-	public EmotionLookup(HashMap<Integer,Integer> sCount){
+	public EmotionLookup(HashMap<Integer,Integer> sCount, Annotation d){
 		this.sentenceCounts = sCount;
+		this.nrcLex = new HashMap<String,String>();
+		this.doc = d;
 	}
 	
 	/*
 	 * Places lexicon into hashmap.
 	 */
-	public void hashNRCLex(){
-		String filePath = "../../text_snippets/super_short_text.txt";
-		BufferedReader br = new BufferedReader(new FileReader(filePath));
-		String line = br.readLine();
+	public void hashNRCLex() throws Exception{
+		String filePath = "../NRC-Emotion-Lexicon-v0.92/NRC-emotion-lexicon-wordlevel-alphabetized-v0.92.txt";
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader(filePath));
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		String line = "";
+		line = br.readLine();
 		StringBuilder sb = new StringBuilder();
 		int index = 0; //Goes in 10s
 		
 		while(line != null){
-			String[] split = line.split(" ");
-			
+			String[] split = line.split("\t");
+			String wd = split[0];
+			String emotPres = split[2];
+			sb.append(emotPres);
 			
 			line = br.readLine();
 			if(index == 9){
+				String fullEmotions = sb.toString();
+				nrcLex.put(wd, fullEmotions);
+				sb.setLength(0);
 				index = 0;
 			} else {
 				index++;
 			}
 		}
 		
+	}
+	
+	public HashMap<String,Integer> checkSentences(){
+		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
+//		HashMap<String,Integer> emotionMap = new HashMap<String,Integer>(){{
+//			put("anger", 0);
+//			put("anticipation", 0);
+//			put("disgust", 0);
+//			put("fear", 0);
+//			put("joy", 0);
+//			put("negative", 0);
+//			put("positive", 0);
+//			put("sadness", 0);
+//			put("surprise", 0);
+//			put("trust", 0);
+//		}};
+		HashMap<String,Integer> emotionMap = new HashMap<String,Integer>(){{
+			put("0", 0);
+			put("1", 0);
+			put("2", 0);
+			put("3", 0);
+			put("4", 0);
+			put("5", 0);
+			put("6", 0);
+			put("7", 0);
+			put("8", 0);
+			put("9", 0);
+		}};
 		
-		String content = new String();
-		try {
-			content = readFile(filePath, StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
+		
+		Integer tally = 0;
+		Iterator it = sentenceCounts.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry<Integer,Integer> pair = (Map.Entry)it.next();
+	        Integer sIndex = pair.getKey();
+	        Integer sCount = pair.getValue();
+	        CoreMap sentence = sentences.get(sIndex);
+	        for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
+	            String word = (token.get(TextAnnotation.class)).toLowerCase();
+	            if(nrcLex.containsKey(word)){
+	            	System.out.println("A word we looked up: " + word);
+	            	String emotionBlock = nrcLex.get(word);
+	            	System.out.println("EmotionBlock: " + emotionBlock);
+	            	for(int j = 0; j<10; j++){
+	            		String mapIndex = "" + j;
+	            		Integer prevCount = emotionMap.get(mapIndex);
+	            		Integer plusCount = Character.getNumericValue(emotionBlock.charAt(j));
+	            		emotionMap.put(mapIndex, prevCount+plusCount);
+	            	}
+	            }
+	                        
+	        }
+	        
+	    }//endwhile
+
+	    return emotionMap;
+	    
 	}
 
 	

@@ -51,6 +51,7 @@ public class NamedEntities {
 	    		String ne = token.get(NamedEntityTagAnnotation.class);
 	    		if (ne.equals("PERSON")){
 	    			String person = token.get(TextAnnotation.class);
+	    			System.out.println("Found person: " + person);
 	    			Integer beginIndex = token.get(CharacterOffsetBeginAnnotation.class);
 	    			Integer endIndex = token.get(CharacterOffsetEndAnnotation.class);
 	        	 

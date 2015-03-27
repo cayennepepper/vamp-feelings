@@ -20,6 +20,22 @@ import java.nio.charset.StandardCharsets;
 
 public class SentimentAnalysis {
 	
+	//Constants....
+	HashMap<String,String> namer = new HashMap<String,String>(){{
+		put("0", "anger");
+		put("1", "anticipation");
+		put("2", "disgust");
+		put("3", "fear");
+		put("4", "joy");
+		put("5", "negative");
+		put("6", "positive");
+		put("7", "sadness");
+		put("8", "surprise");
+		put("9", "trust");
+	}};
+	
+	
+	
 	//Reads in file to a string
 	//Use this for texts to analyze
 	static String readFile(String path, Charset encoding) throws IOException {
@@ -28,8 +44,9 @@ public class SentimentAnalysis {
 	}
 	
 	public static void main(String[] args) {
+		
 		//FILE READIN
-		String filePath = "../../text_snippets/super_short_text.txt";
+		String filePath = "../../text_snippets/temp.txt";
 		String content = new String();
 		try {
 			content = readFile(filePath, StandardCharsets.UTF_8);
@@ -44,7 +61,6 @@ public class SentimentAnalysis {
 		//NER, parsing, and coreference resolution 
 	     Properties props = new Properties();
 	     props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
-//	     props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
 	     props.setProperty("dcoref.maxdist", "-1");
 	     StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 	     
@@ -71,6 +87,30 @@ public class SentimentAnalysis {
 //		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> anaphoraNameIndex = 
 //				 resolver.getAnaphoraNameList();
 		 HashMap<Integer,Integer> sentenceCounts = resolver.getSentenceCounts();
+		 
+		 //Make an emotion lookup. This is what will give us the final emotions associated with vampires,
+		 //in a strictly word emotion association way.
+		 EmotionLookup eLookup = new EmotionLookup(sentenceCounts, document);
+		 try {
+			eLookup.hashNRCLex();
+		} catch (Exception e) {
+			System.out.println("NRC Lexicon creation error!");
+			System.out.println(e.toString());
+		}
+		 
+		 //Get the emotionmap
+		 HashMap<String,Integer> emotionMap = eLookup.checkSentences();
+		 System.out.println("Anger: " + emotionMap.get("0"));
+		 System.out.println("Anticipation: " + emotionMap.get("1"));
+		 System.out.println("Disgust: " + emotionMap.get("2"));
+		 System.out.println("Fear: " + emotionMap.get("3"));
+		 System.out.println("Joy: " + emotionMap.get("4"));
+		 System.out.println("Negative: " + emotionMap.get("5"));
+		 System.out.println("Positive: " + emotionMap.get("6"));
+		 System.out.println("Sadness: " + emotionMap.get("7"));
+		 System.out.println("Surprise: " + emotionMap.get("8"));
+		 System.out.println("Trust: " + emotionMap.get("9"));
+
 		
 		
 	}

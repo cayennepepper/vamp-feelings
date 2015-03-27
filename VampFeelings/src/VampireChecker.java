@@ -118,8 +118,10 @@ public class VampireChecker {
 		//get sentence tokens and iterate
 //		System.out.println("1");
 		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
-//		System.out.println("Sentence Index: " + sentenceIndex);
+		System.out.println("Sentences length: " + sentences.size());
+		System.out.println("Sentence Index: " + sentenceIndex);
 		CoreMap sentence = sentences.get(sentenceIndex);
+		System.out.println("Successfully got sentence index from sentences");
 //		System.out.println("3");
 		for (CoreLabel token: sentence.get(TokensAnnotation.class)){
 			String tokString = token.value().toLowerCase();
