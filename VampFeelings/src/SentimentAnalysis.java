@@ -46,7 +46,7 @@ public class SentimentAnalysis {
 	public static void main(String[] args) {
 		
 		//FILE READIN
-		String filePath = "../../text_snippets/temp.txt";
+		String filePath = "../../text_snippets/int_vampire_snip.txt";
 		String content = new String();
 		try {
 			content = readFile(filePath, StandardCharsets.UTF_8);
@@ -61,7 +61,7 @@ public class SentimentAnalysis {
 		//NER, parsing, and coreference resolution 
 	     Properties props = new Properties();
 	     props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
-	     props.setProperty("dcoref.maxdist", "-1");
+	     props.setProperty("dcoref.maxdist", "2");
 	     StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 	     
 	     
@@ -80,12 +80,16 @@ public class SentimentAnalysis {
 		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> nameIndex = namedEntitiesTuple.x.x;
 		 HashMap<String, String> indexToName = namedEntitiesTuple.x.y;
 		 HashMap<String, Integer> sentenceToIndex = namedEntitiesTuple.y;
+		 Tuple<HashMap<Integer,Integer>, HashMap<Integer,Integer>> begEndAndEndBeg = 
+				 nameGrabber.getPartialIndexMaps();//These are the partial indices map!
+		 
+
+		 
 		 
 		 
 		 //Get an Anaphora Resolver and update the named entity thing
-		 AnaphoraResolution resolver = new AnaphoraResolution(document, nameIndex, indexToName, sentenceToIndex);
-//		 HashMap<String, ArrayList<Tuple<Integer, Integer>>> anaphoraNameIndex = 
-//				 resolver.getAnaphoraNameList();
+		 AnaphoraResolution resolver = 
+				 new AnaphoraResolution(document, nameIndex, indexToName, sentenceToIndex, begEndAndEndBeg);
 		 HashMap<Integer,Integer> sentenceCounts = resolver.getSentenceCounts();
 		 
 		 //Make an emotion lookup. This is what will give us the final emotions associated with vampires,

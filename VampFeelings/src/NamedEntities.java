@@ -29,15 +29,30 @@ public class NamedEntities {
 	private HashMap<String, Integer> nameToSentence =
 			new HashMap<String, Integer>();//Will use to grab the sentence indices for each word.
 	
+	private HashMap<Integer,Integer> beginIndToEnd = 
+			new HashMap<Integer, Integer>();//This is the begin index of a mention, hashing to the end index of a 
+											//a mention. Used for finding 'partial key' in anaphora resolution
+	
+	private HashMap<Integer,Integer> endIndToBegin =
+			new HashMap<Integer,Integer>();//TODO This combined with beginIndToEnd could be a Guava biMap.
+											//This just hashes the opposite direction and is also used for finding
+											//partial key in anaphora resolution.
+	
+	private boolean namedEntitiesGathered = false;
+	
 	public NamedEntities(Annotation annotatedDoc) {
 		this.doc = annotatedDoc;
 	}
 	
 	//Takes in an ANNOTATED DOCUMENT. ALREADY HAS TO GO THROUGH PIPELINE
+	/*
+	 * Returns nameToIndex, indexToName, and nameToSentence
+	 */
 	public Tuple<
 				Tuple<HashMap<String, ArrayList<Tuple<Integer, Integer>>>, HashMap<String, String>>, 
 				HashMap<String,Integer>>
 	getNamedEntities(){
+		namedEntitiesGathered = true;
 		int sentenceNum = 0;
 		//NER
 		// A CoreMap is essentially a Map that uses class objects as keys and has values with custom types
@@ -73,6 +88,10 @@ public class NamedEntities {
 	    			//Also insert string-sentence number into hashmap
 	    			nameToSentence.put(newTupleName, new Integer(sentenceNum));
 	    			
+	    			//Also insert into 'partial key' hashmaps - begin-> end, end->begin
+	    			beginIndToEnd.put(beginIndex, endIndex);
+	    			endIndToBegin.put(endIndex, beginIndex);
+	    			
 	    		}
 	       }
 	    }
@@ -89,6 +108,21 @@ public class NamedEntities {
 	    return new Tuple((new Tuple(nameIndex, indexToName)), nameToSentence);
 	
 	}
+	
+	/*
+	 * While this is bad coding practice, this was done in a time crunch. This method
+	 * Should never be called prior to the previous one. I've put a temporary fix
+	 * by having a boolean change.
+	 */
+	public Tuple<HashMap<Integer,Integer>, HashMap<Integer,Integer>> 
+		getPartialIndexMaps() {
+			if(namedEntitiesGathered){
+				return new Tuple(beginIndToEnd, endIndToBegin);
+			} else {
+				System.out.println("ERROR. Need to call this method with the getNamedEntities method!");
+				return null;
+			}
+		}
 }
 
 

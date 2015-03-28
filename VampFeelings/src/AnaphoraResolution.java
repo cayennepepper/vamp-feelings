@@ -27,15 +27,20 @@ public class AnaphoraResolution {
 	private HashMap<String, ArrayList<Tuple<Integer, Integer>>> nameIndex;
 	private HashMap<String, String> indexToName;
 	private HashMap<String, Integer> indexToSentenceNum = new HashMap<String, Integer>();
+	private HashMap<Integer,Integer> beginIndToEnd;//Partial index checking
+	private HashMap<Integer,Integer> endIndToBegin;//Partial index checking
 
 	public AnaphoraResolution(Annotation annotatedDoc, 
 			HashMap<String, ArrayList<Tuple<Integer, Integer>>> inputNameIndex,
 			HashMap<String, String> inputIndexToName,
-			HashMap<String, Integer> sentence2Index) {
+			HashMap<String, Integer> sentence2Index,
+			Tuple<HashMap<Integer,Integer>,HashMap<Integer,Integer>> begEndEndBeg) {
 		this.doc = annotatedDoc;
 		this.nameIndex = inputNameIndex;
 		this.indexToName = inputIndexToName;
 		this.indexToSentenceNum = sentence2Index;
+		this.beginIndToEnd = begEndEndBeg.x;
+		this.endIndToBegin = begEndEndBeg.y;
 	}
 	
 //	public HashMap<String, ArrayList<Tuple<Integer, Integer>>> getAnaphoraNameList(){
@@ -108,26 +113,26 @@ public class AnaphoraResolution {
             //appears in the index->name hashmap. If it does, we grab the name from the name->index hashmap 
             //and update its value with the entire set of indices and then we break :)
             
-            //TEMP: printing everything in indexSet and indexToName
-//            System.out.println("Stuff in indexSet: ");
-//            for (Tuple<Tuple<Integer,Integer>, Integer> it : indexSet){
-//            	System.out.println(it);
-//            }
-//            System.out.println("Done with stuff in indexSet. Stuff in indexName: ");
-//            for (Tuple<Tuple<Integer,Integer>, Integer> name: example.keySet()){
-//
-//                String key =name.toString();
-//                String value = example.get(name).toString();  
-//                System.out.println(key + " " + value);  
-//            } 
-            
             
             for(Tuple<Tuple<Integer,Integer>, Integer> ind : indexSet){
             	Tuple<Integer,Integer> pruneTup = ind.x;
             	            	
             	if(!indexToName.containsKey(pruneTup.toString())){ //We hash on strings!
-            		continue;
-            	}
+            		//Just because the exact indices don't exist, doesn't mean there wasn't a mismatch between
+            		//anaphora graphs and named entities! This is where partial indices come in. We check if
+            		//there's a match on begin index OR end end index!
+            		Integer beginLookup = pruneTup.x;
+            		Integer endLookup = pruneTup.y;
+            		if(beginIndToEnd.containsKey(beginLookup)){
+            			Integer endIndex = beginIndToEnd.get(beginLookup);
+            			pruneTup = new Tuple<Integer,Integer>(beginLookup,endIndex);
+            		} else if(endIndToBegin.containsKey(endLookup)){
+            			Integer beginIndex = endIndToBegin.get(endLookup);
+            			pruneTup = new Tuple<Integer,Integer>(beginIndex,endLookup);
+            		} else {
+            			continue;
+            		}
+               	}
         		String person = indexToName.get(pruneTup.toString());
         		indexSet.remove(ind); //Get rid of repeat mention
 				ArrayList<Tuple<Integer, Integer>> tempList = nameIndex.get(person); //get already existing
@@ -139,9 +144,17 @@ public class AnaphoraResolution {
 				for(Tuple<Tuple<Integer,Integer>, Integer> dubTup : setAsList){
 					Tuple<Integer,Integer> indexTup = dubTup.x;
 					Integer sentNum = dubTup.y;
+					if(dubTup.y == null){
+						System.out.println("There is a sentenceNumber listed as null for: " + dubTup);
+					}
 					tempList.add(indexTup);
 					indexToSentenceNum.put(indexTup.toString(), sentNum);
-
+					if((indexTup.x).equals(new Integer(47232))){
+						System.out.println("GOT 47232!");
+						System.out.println("Here is the indexTup: "+ indexTup);
+						System.out.println("Her is the sentence number: "+ sentNum);
+						System.out.println("Here is what's in indexToSentenceNum: "+ indexToSentenceNum.get((indexTup).toString()));
+					}
 				}
 				nameIndex.put(person, tempList);
 				break;

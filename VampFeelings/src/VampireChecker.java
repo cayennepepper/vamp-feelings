@@ -52,7 +52,13 @@ public class VampireChecker {
 	public Tuple<HashMap<String, ArrayList<Tuple<Integer,Integer>>>,
 	HashMap<Integer,Integer>> getNearVampiresSCount(){
 
-		
+		//Checking if indexToSentenceNum has anything that's null in it...
+		String tempTup = (new Tuple<Integer,Integer>(new Integer(47232), new Integer(47238)).toString());
+		if(indexToSentenceNum.containsKey(tempTup))
+		{
+			System.out.println("ALOHA! indexToSentenceNum contains the key in question :)");
+			System.out.println("This is the sentence number its at: " + indexToSentenceNum.get(tempTup));
+		}
 		
 		
 		//DEBUGGING
@@ -75,15 +81,20 @@ public class VampireChecker {
 	        
 	        
 	        Iterator indMenIt = indexMentions.iterator();
+	        System.out.println("Size of indexMentions in VampireChecker: " + indexMentions.size());
+	        int tempCount = 0;
 	        while (indMenIt.hasNext()){
+	        	tempCount++;
+//		        System.out.println("TempCount is: " + tempCount);
 	        	Tuple<Integer,Integer> toCheck = (Tuple<Integer,Integer>)(indMenIt.next());
 	        	
 	        	//Get the sentence number. If not near vampire, remove index both from NER hashmap
 	        	//and from sentence number hashmap.
+	        	System.out.println("toCheck to string is: " + toCheck.toString());
 	        	Integer sentenceIndex = indexToSentenceNum.get(toCheck.toString());
 	        	if(!isNearVampire(sentenceIndex)){
 	        		indMenIt.remove();
-	        		indexToSentenceNum.remove(toCheck.toString());
+//	        		indexToSentenceNum.remove(toCheck.toString());
 	        		continue;
 	        	}
 	        	uniqueSentenceNumbers.add(sentenceIndex);
@@ -118,10 +129,9 @@ public class VampireChecker {
 		//get sentence tokens and iterate
 //		System.out.println("1");
 		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
-		System.out.println("Sentences length: " + sentences.size());
 		System.out.println("Sentence Index: " + sentenceIndex);
 		CoreMap sentence = sentences.get(sentenceIndex);
-		System.out.println("Successfully got sentence index from sentences");
+//		System.out.println("Successfully got sentence index from sentences");
 //		System.out.println("3");
 		for (CoreLabel token: sentence.get(TokensAnnotation.class)){
 			String tokString = token.value().toLowerCase();

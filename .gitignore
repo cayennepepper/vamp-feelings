@@ -1,0 +1,8 @@
+.classpath
+.project
+.recommenders/
+.settings/
+VampFeelings/bin/EmotionLookup$1.class
+VampFeelings/bin/SentimentAnalysis$1.class
+.metadata/
+NRC-Emotion-Lexicon-v0.92/
