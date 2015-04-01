@@ -55,8 +55,10 @@ public class NamedEntities {
 		namedEntitiesGathered = true;
 		int sentenceNum = 0;
 		//NER
-//		boolean isBuildingName = false;
-//		String nameInProgress = "";
+		boolean isBuildingName = false;
+		String nameInProgress = "";
+		Integer beginIndex = 0;
+		Integer endIndex = 0;
 		// A CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
 	    for(CoreMap sentence: sentences) {
@@ -64,30 +66,33 @@ public class NamedEntities {
 	    	// A CoreLabel is a CoreMap with additional token-specific methods
 	    	for (CoreLabel token: sentence.get(TokensAnnotation.class)) { 
 	    		//Check if this is a person. If so, place the appearance in the map.
-	    		
 	    		String ne = token.get(NamedEntityTagAnnotation.class);
 	    		if (ne.equals("PERSON")){
 	    			String person = token.get(TextAnnotation.class);
-//	    			System.out.println("Found person: " + person);
-	    			Integer beginIndex = token.get(CharacterOffsetBeginAnnotation.class);
-	    			Integer endIndex = token.get(CharacterOffsetEndAnnotation.class);
-	    			System.out.println("Person: " + person + " location: " + beginIndex + "," + endIndex);
-
-	        	 
+	    			//Cases: we're building a name and will concat
+	    			if(isBuildingName){
+	    				nameInProgress = nameInProgress + " " + person;
+	    			} else { //Case: we are starting a new name
+	    				nameInProgress = person;
+	    				beginIndex = token.get(CharacterOffsetBeginAnnotation.class);
+	    				isBuildingName = true;
+	    			}
+	    		} else if(isBuildingName) { //and it's NOT a person
+	    			endIndex = token.get(CharacterOffsetEndAnnotation.class);
 	    			//Insert into name->index hashmap
-	    			if(nameIndex.containsKey(person)) {
-	    				ArrayList<Tuple<Integer, Integer>> tempList = nameIndex.get(person);
+	    			if(nameIndex.containsKey(nameInProgress)) {
+	    				ArrayList<Tuple<Integer, Integer>> tempList = nameIndex.get(nameInProgress);
 	    				tempList.add(new Tuple(beginIndex, endIndex));
-	    				nameIndex.put(person, tempList);
+	    				nameIndex.put(nameInProgress, tempList);
 	    			} else {
 	    				ArrayList<Tuple<Integer, Integer>> tempList = new ArrayList<Tuple<Integer, Integer>>();
 	    				tempList.add(new Tuple(beginIndex, endIndex));
-	    				nameIndex.put(person, tempList);
+	    				nameIndex.put(nameInProgress, tempList);
 	    			}
 	    			
 	    			//Also insert into index->name hashmap
 	    			String newTupleName = (new Tuple(beginIndex, endIndex)).toString();
-	    			indexToName.put(newTupleName, person);
+	    			indexToName.put(newTupleName, nameInProgress);
 	    			
 	    			//Also insert string-sentence number into hashmap
 	    			nameToSentence.put(newTupleName, new Integer(sentenceNum));
@@ -96,18 +101,18 @@ public class NamedEntities {
 	    			beginIndToEnd.put(beginIndex, endIndex);
 	    			endIndToBegin.put(endIndex, beginIndex);
 	    			
+	    			//Reset isbuilding and string
+	    			System.out.println("New person: " + nameInProgress + " Indices: " + beginIndex + "," + endIndex);
+	    			nameInProgress = "";
+	    			isBuildingName = false;
+	    		} else {
+	    			//name is not in progress. Do nothing
 	    		}
-	       }
+
+	        		
+	    	}
+	       
 	    }
-	    
-	    //Print out everything.
-//	    System.out.println("THIS IS THE ORIGINAL NAME SET...");
-//	    for (String personName : nameIndex.keySet()){
-//	    	//Get the list of mentions
-//	    	ArrayList<Tuple<Integer, Integer>> mentionList = nameIndex.get(personName);
-//	    	String val = mentionList.toString();
-//	    	System.out.println("Person: " + personName + " Mention List: " + val);
-//	    }
 	    
 	    return new Tuple((new Tuple(nameIndex, indexToName)), nameToSentence);
 	

@@ -58,6 +58,9 @@ public class EmotionLookup {
 		while(line != null){
 			String[] split = line.split("\t");
 			String wd = split[0];
+			if(wd.contains("vampire")){
+				System.out.println("Oops. Dict contains vampire");
+			}
 			String emotPres = split[2];
 			sb.append(emotPres);
 			
@@ -111,12 +114,12 @@ public class EmotionLookup {
 	        Integer sCount = pair.getValue();
 	        CoreMap sentence = sentences.get(sIndex);
 	        for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
-	            String word = (token.get(TextAnnotation.class)).toLowerCase();
+//	            String word = (token.get(TextAnnotation.class)).toLowerCase();
+	            String word = (token.get(LemmaAnnotation.class));
 	            if(nrcLex.containsKey(word)){
 	            	tally++;
 //	            	System.out.println("A word we looked up: " + word);
 	            	String emotionBlock = nrcLex.get(word);
-//	            	System.out.println("EmotionBlock: " + emotionBlock);
 	            	for(int j = 0; j<10; j++){
 	            		String mapIndex = "" + j;
 	            		Integer prevCount = emotionMap.get(mapIndex);
