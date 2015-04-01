@@ -1,0 +1,7 @@
+Some issues
+
+
+NER
+Van Helsing - NER parsing gives 'Van' and 'Helsing'
+It picks up on 'Un-dead' as a person, but only sometimes (?)
+picks up on M. D. each letter as its own entity...

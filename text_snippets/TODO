@@ -2,7 +2,8 @@ Generate graphs for the emotions
 DONE Hard code "the vampire" as a character
 DONE Speed up code (dcoref prop to not -1)
 DONE dd "vampires" as a character
-Create snippets for tuning purposes!
+DONE Create snippets for tuning purposes!
+Do Lemmatization!
 
 
 DONE Fix discrepancy b/w anaphora and ner - instead of Elizabeth, Elizabeth the vampire - want to have start index of both and that can show its the same

@@ -46,7 +46,7 @@ public class SentimentAnalysis {
 	public static void main(String[] args) {
 		
 		//FILE READIN
-		String filePath = "../../text_snippets/int_vampire_snip.txt";
+		String filePath = "../text_snippets/Dracula_tune.txt";
 		String content = new String();
 		try {
 			content = readFile(filePath, StandardCharsets.UTF_8);

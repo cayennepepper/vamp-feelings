@@ -55,6 +55,8 @@ public class NamedEntities {
 		namedEntitiesGathered = true;
 		int sentenceNum = 0;
 		//NER
+//		boolean isBuildingName = false;
+//		String nameInProgress = "";
 		// A CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
 	    for(CoreMap sentence: sentences) {
@@ -69,6 +71,8 @@ public class NamedEntities {
 //	    			System.out.println("Found person: " + person);
 	    			Integer beginIndex = token.get(CharacterOffsetBeginAnnotation.class);
 	    			Integer endIndex = token.get(CharacterOffsetEndAnnotation.class);
+	    			System.out.println("Person: " + person + " location: " + beginIndex + "," + endIndex);
+
 	        	 
 	    			//Insert into name->index hashmap
 	    			if(nameIndex.containsKey(person)) {

@@ -1,0 +1,11 @@
+Line numbers for tune and test
+Interview with a vampire - Tune: 339 to 359
+Carmilla - Tune: 3049 to 3227
+Dead Until Dark - Tune: 99 to 2013 Test: 1 to 97
+Guilty Pleasures - Tune: 244 to 394 Test: 1 to 152
+Salem's Lot - Tune: 6930 to 7045 Test: 6495 to 6644
+Lover Eternal - Tune: 272 to 402 Test: 93 to 237
+The Historian - Tune: 1311 to 1362 Test: 760 to 822
+Twilight - Tune: 6467 to 6607 Test: 2489 to 2590
+Varney the Vampire - Tune: 15701 to 15930 Test: 920 to 1141
+Dracula - Tune: 8078 to 8307  Test: 560 to 662

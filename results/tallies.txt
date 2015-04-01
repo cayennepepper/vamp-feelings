@@ -50,3 +50,13 @@ Positive: 27
 Sadness: 10
 Surprise: 7
 Trust: 16
+Anger: 1
+Anticipation: 1
+Disgust: 2
+Fear: 1
+Joy: 1
+Negative: 4
+Positive: 1
+Sadness: 0
+Surprise: 0
+Trust: 1
