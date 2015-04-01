@@ -1,0 +1,23 @@
+Generate graphs for the emotions
+DONE Hard code "the vampire" as a character
+DONE Speed up code (dcoref prop to not -1)
+DONE dd "vampires" as a character
+Create snippets for tuning purposes!
+
+
+DONE Fix discrepancy b/w anaphora and ner - instead of Elizabeth, Elizabeth the vampire - want to have start index of both and that can show its the same
+
+Evaluation
+	NER
+		DONE Take a percentage of a book from early period and hand tag it with NER
+		DONE Take from a newer book
+		See how precision and recall compare.
+	ANAPHORA
+		How well did it do the resolution? - precision and recall - write a program to check those. What is in the file that should be and what is not in the file that should be?
+	VAMPIRE
+		Take same text sections and make binary decision if it got the vampire or not
+
+
+
+Training: pick a book from each year-span bin and choose a small section to hand-tag. This will be to tune.
+Everything else will be test set.

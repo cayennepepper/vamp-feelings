@@ -113,9 +113,10 @@ public class EmotionLookup {
 	        for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
 	            String word = (token.get(TextAnnotation.class)).toLowerCase();
 	            if(nrcLex.containsKey(word)){
-	            	System.out.println("A word we looked up: " + word);
+	            	tally++;
+//	            	System.out.println("A word we looked up: " + word);
 	            	String emotionBlock = nrcLex.get(word);
-	            	System.out.println("EmotionBlock: " + emotionBlock);
+//	            	System.out.println("EmotionBlock: " + emotionBlock);
 	            	for(int j = 0; j<10; j++){
 	            		String mapIndex = "" + j;
 	            		Integer prevCount = emotionMap.get(mapIndex);
@@ -128,6 +129,7 @@ public class EmotionLookup {
 	        
 	    }//endwhile
 
+	    System.out.println("Total number of words looked up: " + tally);
 	    return emotionMap;
 	    
 	}

@@ -48,17 +48,8 @@ public class VampireChecker {
 	 * constructs a hashmap of Integer,Integer that will give the sentence numbers and the number
 	 * of times those words need to be evaluated.
 	 */
-//	public HashMap<String, ArrayList<Tuple<Integer,Integer>>> getNearVampires(){
 	public Tuple<HashMap<String, ArrayList<Tuple<Integer,Integer>>>,
 	HashMap<Integer,Integer>> getNearVampiresSCount(){
-
-		//Checking if indexToSentenceNum has anything that's null in it...
-		String tempTup = (new Tuple<Integer,Integer>(new Integer(47232), new Integer(47238)).toString());
-		if(indexToSentenceNum.containsKey(tempTup))
-		{
-			System.out.println("ALOHA! indexToSentenceNum contains the key in question :)");
-			System.out.println("This is the sentence number its at: " + indexToSentenceNum.get(tempTup));
-		}
 		
 		
 		//DEBUGGING
@@ -81,19 +72,17 @@ public class VampireChecker {
 	        
 	        
 	        Iterator indMenIt = indexMentions.iterator();
-	        System.out.println("Size of indexMentions in VampireChecker: " + indexMentions.size());
-	        int tempCount = 0;
+//	        System.out.println("Size of indexMentions in VampireChecker: " + indexMentions.size());
 	        while (indMenIt.hasNext()){
-	        	tempCount++;
-//		        System.out.println("TempCount is: " + tempCount);
 	        	Tuple<Integer,Integer> toCheck = (Tuple<Integer,Integer>)(indMenIt.next());
 	        	
 	        	//Get the sentence number. If not near vampire, remove index both from NER hashmap
 	        	//and from sentence number hashmap.
-	        	System.out.println("toCheck to string is: " + toCheck.toString());
+//	        	System.out.println("toCheck to string is: " + toCheck.toString());
 	        	Integer sentenceIndex = indexToSentenceNum.get(toCheck.toString());
 	        	if(!isNearVampire(sentenceIndex)){
 	        		indMenIt.remove();
+	        		//TODO INVESTIGATE PROBLEMS WITH THIS
 //	        		indexToSentenceNum.remove(toCheck.toString());
 	        		continue;
 	        	}
@@ -127,31 +116,20 @@ public class VampireChecker {
 	//May want to make it check the surrounding two sentences also
 	public boolean isNearVampire(Integer sentenceIndex){
 		//get sentence tokens and iterate
-//		System.out.println("1");
 		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
-		System.out.println("Sentence Index: " + sentenceIndex);
 		CoreMap sentence = sentences.get(sentenceIndex);
-//		System.out.println("Successfully got sentence index from sentences");
-//		System.out.println("3");
 		for (CoreLabel token: sentence.get(TokensAnnotation.class)){
 			String tokString = token.value().toLowerCase();
-			if(tokString.equalsIgnoreCase("vampire")){
+			if(tokString.equalsIgnoreCase("vampire") ||
+					tokString.equalsIgnoreCase("vampires") ||
+					tokString.equalsIgnoreCase("vampyre") ||
+					tokString.equalsIgnoreCase("vampyres")){
 				return true;
 			}
 		}
 		return false;
 	}
 	
-//	public boolean isNearVampire(List<CoreLabel> tokAnn){
-//		for (CoreLabel token : tokAnn){
-//			String tokString = token.value().toLowerCase();
-//			if(tokString.equalsIgnoreCase("vampire")){
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
 	
-	//		List<CoreLabel>tks = doc.get(SentencesAnnotation.class).get(m.sentNum-1).get(TokensAnnotation.class)
 
 }

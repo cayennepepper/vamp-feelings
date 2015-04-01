@@ -66,7 +66,7 @@ public class NamedEntities {
 	    		String ne = token.get(NamedEntityTagAnnotation.class);
 	    		if (ne.equals("PERSON")){
 	    			String person = token.get(TextAnnotation.class);
-	    			System.out.println("Found person: " + person);
+//	    			System.out.println("Found person: " + person);
 	    			Integer beginIndex = token.get(CharacterOffsetBeginAnnotation.class);
 	    			Integer endIndex = token.get(CharacterOffsetEndAnnotation.class);
 	        	 
@@ -97,13 +97,13 @@ public class NamedEntities {
 	    }
 	    
 	    //Print out everything.
-	    System.out.println("THIS IS THE ORIGINAL NAME SET...");
-	    for (String personName : nameIndex.keySet()){
-	    	//Get the list of mentions
-	    	ArrayList<Tuple<Integer, Integer>> mentionList = nameIndex.get(personName);
-	    	String val = mentionList.toString();
-	    	System.out.println("Person: " + personName + " Mention List: " + val);
-	    }
+//	    System.out.println("THIS IS THE ORIGINAL NAME SET...");
+//	    for (String personName : nameIndex.keySet()){
+//	    	//Get the list of mentions
+//	    	ArrayList<Tuple<Integer, Integer>> mentionList = nameIndex.get(personName);
+//	    	String val = mentionList.toString();
+//	    	System.out.println("Person: " + personName + " Mention List: " + val);
+//	    }
 	    
 	    return new Tuple((new Tuple(nameIndex, indexToName)), nameToSentence);
 	

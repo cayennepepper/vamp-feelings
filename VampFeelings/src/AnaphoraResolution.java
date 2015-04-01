@@ -29,6 +29,8 @@ public class AnaphoraResolution {
 	private HashMap<String, Integer> indexToSentenceNum = new HashMap<String, Integer>();
 	private HashMap<Integer,Integer> beginIndToEnd;//Partial index checking
 	private HashMap<Integer,Integer> endIndToBegin;//Partial index checking
+	
+	private int vampCount = 0;
 
 	public AnaphoraResolution(Annotation annotatedDoc, 
 			HashMap<String, ArrayList<Tuple<Integer, Integer>>> inputNameIndex,
@@ -67,27 +69,38 @@ public class AnaphoraResolution {
             Set<Tuple<Tuple<Integer,Integer>, Integer>> indexSet = 
             		new HashSet<Tuple<Tuple<Integer,Integer>, Integer>>();
             
+            //This set is for mentions containing "vampire". These automatically get put into nameIndex,
+            //with "the vampire" as being the named entity. We force the introduction of "the vampire" 
+            //into the nameIndex hashmap.
+            Set<Tuple<Tuple<Integer,Integer>, Integer>> vampireSet = 
+            		new HashSet<Tuple<Tuple<Integer,Integer>, Integer>>();
+            
             CorefMention cm = c.getRepresentativeMention();
-//            System.out.println("Here is a CorefMention: " + cm);
-            Integer repMentionBeginInd = 0;
-            Integer repMentionEndInd = 0;
             List<CoreLabel> tks = doc.get(SentencesAnnotation.class).get(cm.sentNum-1).get(TokensAnnotation.class);
-//            for(int i = cm.startIndex-1; i < cm.endIndex-1; i++) {
-//            	Integer beginIndex = tks.get(i).get(CharacterOffsetBeginAnnotation.class);
-//				Integer endIndex = tks.get(i).get(CharacterOffsetEndAnnotation.class);
-//				if (i == cm.startIndex-1){
-//					repMentionBeginInd = beginIndex;
-//				}
-//				if (i == cm.endIndex-2){
-//					repMentionEndInd = endIndex;
-//				}
-//            }
-//            //Add repMention's indices to the indexSet
-//            indexSet.add(new Tuple(repMentionBeginInd, repMentionEndInd));
             
 
+            boolean thereIsVampMention = false;
             for(CorefMention m : c.getMentionsInTextualOrder()){
-//                System.out.println(" And here is another mention: "+ m);
+            	if(
+            			(
+            				(
+            					m.toString().contains(new String("the vampire")) ||
+            					m.toString().contains(new String("the vampyre")) ||
+            					m.toString().contains(new String("The vampire")) ||
+            					m.toString().contains(new String("The vampyre"))
+            				) && m.toString().split(" ").length == 5
+            			)
+            				||
+            				(	
+            						(
+            						m.toString().contains(new String("vampires")) || 
+            						m.toString().contains(new String("vampyres"))
+            						) && m.toString().split(" ").length == 4
+            				)
+            		){
+//            		System.out.println("mention m contains vampire: " + m.toString());
+            		thereIsVampMention = true;
+            	}//This sees if one of the forms of 'vampire' listed above is included
             	Integer bIndex = 0;
             	Integer eIndex = 0;
             	Integer sNum = m.sentNum-1;
@@ -103,16 +116,17 @@ public class AnaphoraResolution {
     					Tuple<Tuple<Integer,Integer>, Integer> newTup = 
     							new Tuple((new Tuple(bIndex, eIndex)), sNum);
     					indexSet.add(newTup); //Can add after we know end index.
-    					//Add to the index -> sentence number
-    					String tupToString = newTup.toString();
     					
     				}
                 }
             }
+            if(thereIsVampMention){
+            	vampireSet.addAll(indexSet);
+            }
+            
             //Now we check everything against the mentions. This involves seeing if the index in question
             //appears in the index->name hashmap. If it does, we grab the name from the name->index hashmap 
             //and update its value with the entire set of indices and then we break :)
-            
             
             for(Tuple<Tuple<Integer,Integer>, Integer> ind : indexSet){
             	Tuple<Integer,Integer> pruneTup = ind.x;
@@ -124,9 +138,11 @@ public class AnaphoraResolution {
             		Integer beginLookup = pruneTup.x;
             		Integer endLookup = pruneTup.y;
             		if(beginIndToEnd.containsKey(beginLookup)){
+//            			System.out.println("Have a word that matches on just begin index!");
             			Integer endIndex = beginIndToEnd.get(beginLookup);
             			pruneTup = new Tuple<Integer,Integer>(beginLookup,endIndex);
             		} else if(endIndToBegin.containsKey(endLookup)){
+//            			System.out.println("Have a word that matches on just end index!");
             			Integer beginIndex = endIndToBegin.get(endLookup);
             			pruneTup = new Tuple<Integer,Integer>(beginIndex,endLookup);
             		} else {
@@ -144,23 +160,32 @@ public class AnaphoraResolution {
 				for(Tuple<Tuple<Integer,Integer>, Integer> dubTup : setAsList){
 					Tuple<Integer,Integer> indexTup = dubTup.x;
 					Integer sentNum = dubTup.y;
-					if(dubTup.y == null){
-						System.out.println("There is a sentenceNumber listed as null for: " + dubTup);
-					}
 					tempList.add(indexTup);
 					indexToSentenceNum.put(indexTup.toString(), sentNum);
-					if((indexTup.x).equals(new Integer(47232))){
-						System.out.println("GOT 47232!");
-						System.out.println("Here is the indexTup: "+ indexTup);
-						System.out.println("Her is the sentence number: "+ sentNum);
-						System.out.println("Here is what's in indexToSentenceNum: "+ indexToSentenceNum.get((indexTup).toString()));
-					}
 				}
 				nameIndex.put(person, tempList);
 				break;
             }
             
+            //Now we mass-place all mentions containing "vampire" into nameIndex. We force the named entity
+            //'the vampire' to be a key in nameIndex if it's not already there. Also place sentence numbers
+            //of each mention into indexToSentenceNum
+            if(!nameIndex.containsKey("the vampire")){
+            	nameIndex.put("the vampire", new ArrayList<Tuple<Integer,Integer>>());
+            }
+
+            ArrayList<Tuple<Integer,Integer>> vampMentionList = nameIndex.get("the vampire");
+            for(Tuple<Tuple<Integer,Integer>, Integer> vampireEntry : vampireSet){
+            	vampCount++;
+            	Tuple<Integer,Integer> indexTup = vampireEntry.x;
+            	Integer sentNum = vampireEntry.y;
+            	vampMentionList.add(indexTup);
+            	indexToSentenceNum.put(indexTup.toString(), sentNum);
+            }
+            
         }
+        
+//        System.out.println("Total number of 'vampire'-containing mentions: " + vampCount);
         
         //TODO is this a problem??
         //Prune out everything that isn't around "vampire"
