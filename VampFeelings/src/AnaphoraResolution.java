@@ -80,7 +80,7 @@ public class AnaphoraResolution {
             
 
             boolean thereIsVampMention = false;
-            System.out.println("Here's a list of mentions: ");
+//            System.out.println("Here's a list of mentions: ");
             for(CorefMention m : c.getMentionsInTextualOrder()){
             	if(
             			(
@@ -121,9 +121,10 @@ public class AnaphoraResolution {
     				}
                 }
                 
-                System.out.println("Mention: " + m.toString() + " with indices: " + bIndex + "," + eIndex);
+//                System.out.println("Mention: " + m.toString() + " with indices: " + bIndex + "," + eIndex);
             }
             if(thereIsVampMention){
+            	System.out.println("Vampire is mentioned!");
             	vampireSet.addAll(indexSet);
             }
             
