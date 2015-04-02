@@ -46,7 +46,7 @@ public class SentimentAnalysis {
 	public static void main(String[] args) {
 		
 		//FILE READIN
-		String filePath = "../text_snippets/Int_txts/Salem/Salem_14.txt";
+		String filePath = "../text_snippets/Int_txts/Lover/Lover_3.txt";
 		String content = new String();
 		try {
 			content = readFile(filePath, StandardCharsets.UTF_8);
@@ -117,7 +117,7 @@ public class SentimentAnalysis {
 		 
 		 //Place all the results into a file
 		 try(PrintWriter out = new PrintWriter(new BufferedWriter
-				 (new FileWriter("../text_snippets/Int_txts/Salem/Salem_results.txt", true)))) {
+				 (new FileWriter("../text_snippets/Int_txts/Lover/Lover_results.txt", true)))) {
 			 	 out.println("Anger: " + emotionMap.get("0"));
 				 out.println("Anticipation: " + emotionMap.get("1"));
 				 out.println("Disgust: " + emotionMap.get("2"));
