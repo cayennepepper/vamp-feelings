@@ -46,7 +46,7 @@ public class SentimentAnalysis {
 	public static void main(String[] args) {
 		
 		//FILE READIN
-		String filePath = "../text_snippets/Int_txts/Lover/Lover_3.txt";
+		String filePath = "../text_snippets/Dead_Until_Dark_test.txt";
 		String content = new String();
 		try {
 			content = readFile(filePath, StandardCharsets.UTF_8);
@@ -116,21 +116,21 @@ public class SentimentAnalysis {
 		 System.out.println("Trust: " + emotionMap.get("9"));
 		 
 		 //Place all the results into a file
-		 try(PrintWriter out = new PrintWriter(new BufferedWriter
-				 (new FileWriter("../text_snippets/Int_txts/Lover/Lover_results.txt", true)))) {
-			 	 out.println("Anger: " + emotionMap.get("0"));
-				 out.println("Anticipation: " + emotionMap.get("1"));
-				 out.println("Disgust: " + emotionMap.get("2"));
-				 out.println("Fear: " + emotionMap.get("3"));
-				 out.println("Joy: " + emotionMap.get("4"));
-				 out.println("Negative: " + emotionMap.get("5"));
-				 out.println("Positive: " + emotionMap.get("6"));
-				 out.println("Sadness: " + emotionMap.get("7"));
-				 out.println("Surprise: " + emotionMap.get("8"));
-				 out.println("Trust: " + emotionMap.get("9"));			
-			 }catch (IOException e) {
-				 System.out.println("Error trying to write tallies to file: " + e.toString());
-			 }
+//		 try(PrintWriter out = new PrintWriter(new BufferedWriter
+//				 (new FileWriter("../text_snippets/Int_txts/Varney/Varney_results.txt", true)))) {
+//			 	 out.println("Anger: " + emotionMap.get("0"));
+//				 out.println("Anticipation: " + emotionMap.get("1"));
+//				 out.println("Disgust: " + emotionMap.get("2"));
+//				 out.println("Fear: " + emotionMap.get("3"));
+//				 out.println("Joy: " + emotionMap.get("4"));
+//				 out.println("Negative: " + emotionMap.get("5"));
+//				 out.println("Positive: " + emotionMap.get("6"));
+//				 out.println("Sadness: " + emotionMap.get("7"));
+//				 out.println("Surprise: " + emotionMap.get("8"));
+//				 out.println("Trust: " + emotionMap.get("9"));			
+//			 }catch (IOException e) {
+//				 System.out.println("Error trying to write tallies to file: " + e.toString());
+//			 }
 
 		
 		

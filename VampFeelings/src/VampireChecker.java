@@ -50,14 +50,7 @@ public class VampireChecker {
 	 */
 	public Tuple<HashMap<String, ArrayList<Tuple<Integer,Integer>>>,
 	HashMap<Integer,Integer>> getNearVampiresSCount(){
-		
-		
-		//DEBUGGING
-//		Iterator blah = indexToSentenceNum.entrySet().iterator();
-//		while (blah.hasNext()){
-//			Map.Entry<String, Integer> p = (Map.Entry)blah.next();
-//			System.out.println("Index: " + p.getKey() + " and sentence number: " + p.getValue());
-//		}
+
 		
 		
 	    Iterator it = indexMap.entrySet().iterator();
@@ -70,15 +63,16 @@ public class VampireChecker {
 	        //to keep track of sentence numbers for a particular vampire mention (+ anaphoras)
 	        Set<Integer> uniqueSentenceNumbers = new HashSet<Integer>();
 	        
-	        
+	        //Here is a possible issue: we're going through every single anaphora and checking it
+	        //separately to see if it's near 'vampire.' I think this is giving us better results
+	        //than if we were just to find 'vampire' near one of the anaphora group and immediately 
+	        //assign every mention to be a vampire character, but...
 	        Iterator indMenIt = indexMentions.iterator();
-//	        System.out.println("Size of indexMentions in VampireChecker: " + indexMentions.size());
 	        while (indMenIt.hasNext()){
 	        	Tuple<Integer,Integer> toCheck = (Tuple<Integer,Integer>)(indMenIt.next());
 	        	
 	        	//Get the sentence number. If not near vampire, remove index both from NER hashmap
 	        	//and from sentence number hashmap.
-//	        	System.out.println("toCheck to string is: " + toCheck.toString());
 	        	Integer sentenceIndex = indexToSentenceNum.get(toCheck.toString());
 	        	if(!isNearVampire(sentenceIndex)){
 	        		indMenIt.remove();
@@ -86,6 +80,13 @@ public class VampireChecker {
 //	        		indexToSentenceNum.remove(toCheck.toString());
 	        		continue;
 	        	}
+	        	
+	        	//Ostensibly around a vampire:
+//	    		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
+//	    		CoreMap sentence = sentences.get(sentenceIndex);
+//	    		System.out.println("Sentence index:" + sentenceIndex);
+//	    		System.out.println("Sentence itself: " + sentence);
+//	        	System.out.println("Place to check" + toCheck);
 	        	uniqueSentenceNumbers.add(sentenceIndex);
 	        }
 	        
@@ -100,6 +101,8 @@ public class VampireChecker {
 
 	        }
 	    }
+	    	    
+	    
 //	    return indexMap;
 	    return new Tuple(indexMap, sentenceNumToCount);
 	}

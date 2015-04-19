@@ -62,6 +62,7 @@ public class NamedEntities {
 		// A CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
 	    for(CoreMap sentence: sentences) {
+//	    	sentenceNum = sentence.
 	    	// Traversing the words in the current sentence
 	    	// A CoreLabel is a CoreMap with additional token-specific methods
 	    	for (CoreLabel token: sentence.get(TokensAnnotation.class)) { 
@@ -80,6 +81,10 @@ public class NamedEntities {
 	    		} else if(isBuildingName) { //and it's NOT a person
 	    			endIndex = token.get(CharacterOffsetEndAnnotation.class);
 	    			//Insert into name->index hashmap
+	    			if(nameInProgress.equals("Denise")){
+	    				System.out.println("Found Denise in NER!");
+	    				
+	    			}
 	    			if(nameIndex.containsKey(nameInProgress)) {
 	    				ArrayList<Tuple<Integer, Integer>> tempList = nameIndex.get(nameInProgress);
 	    				tempList.add(new Tuple(beginIndex, endIndex));

@@ -26,7 +26,7 @@ public class AnaphoraResolution {
 	private Annotation doc;
 	private HashMap<String, ArrayList<Tuple<Integer, Integer>>> nameIndex;
 	private HashMap<String, String> indexToName;
-	private HashMap<String, Integer> indexToSentenceNum = new HashMap<String, Integer>();
+	private HashMap<String, Integer> indexToSentenceNum;
 	private HashMap<Integer,Integer> beginIndToEnd;//Partial index checking
 	private HashMap<Integer,Integer> endIndToBegin;//Partial index checking
 	
@@ -56,7 +56,7 @@ public class AnaphoraResolution {
             CorefChain c = entry.getValue();
 
             //Avoid those that are only self-references
-            if(c.getMentionsInTextualOrder() .size() <= 1){
+            if(c.getMentionsInTextualOrder() .size() < 1){
                 continue;
             }
 
@@ -121,10 +121,16 @@ public class AnaphoraResolution {
     				}
                 }
                 
-//                System.out.println("Mention: " + m.toString() + " with indices: " + bIndex + "," + eIndex);
+                Tuple<Integer,Integer> senTuple = new Tuple<Integer,Integer>(bIndex,eIndex);
+                indexToSentenceNum.put(senTuple.toString(), sNum);
+                
+//                if(m.toString().contains("Denise")){
+//                  System.out.println("MMMMMMMMMMMention: " + m.toString() + " with indices: " + bIndex + "," + eIndex);
+//                  System.out.println("Denise sentence Number: " + sNum);
+//                }
             }
             if(thereIsVampMention){
-            	System.out.println("Vampire is mentioned!");
+//            	System.out.println("Vampire is mentioned!");
             	vampireSet.addAll(indexSet);
             }
             
@@ -156,6 +162,14 @@ public class AnaphoraResolution {
         		String person = indexToName.get(pruneTup.toString());
         		indexSet.remove(ind); //Get rid of repeat mention
 				ArrayList<Tuple<Integer, Integer>> tempList = nameIndex.get(person); //get already existing
+        		if(person.equals("Denise")){
+        			System.out.println("HOLA DENISE IS FOUND");
+        			for(Tuple<Integer,Integer> t : tempList){
+        				System.out.println("Denise Index: " + t);
+        				Integer sentN = indexToSentenceNum.get(t.toString());
+        				System.out.println("Sentence number is: " + sentN);
+        			}
+        		}
 				//Get the arraylist of tuple< tuple<beginIndex, endIndex>, sentenceNum and strip the indices.
 				//Those indices get put into nameIndex.
 				//Place the sentence numbers into indexToSentenceNum.
@@ -165,6 +179,13 @@ public class AnaphoraResolution {
 					Tuple<Integer,Integer> indexTup = dubTup.x;
 					Integer sentNum = dubTup.y;
 					tempList.add(indexTup);
+//					System.out.println("The person's index in question: " + indexTup);
+//					System.out.println("The sentence index is: " + sentNum);
+//		    		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
+//		    		CoreMap sentence = sentences.get(sentNum);
+//		    		System.out.println("Sentence itself: " + sentence);
+		    		
+		    		
 					indexToSentenceNum.put(indexTup.toString(), sentNum);
 				}
 				nameIndex.put(person, tempList);
@@ -194,8 +215,10 @@ public class AnaphoraResolution {
         //TODO is this a problem??
         //Prune out everything that isn't around "vampire"
         VampireChecker checker = new VampireChecker(this.doc, this.nameIndex, this.indexToSentenceNum);
-        HashMap<Integer,Integer> sentCount = checker.getNearVampiresSCount().y;
-        nameIndex = checker.getNearVampiresSCount().x;        
+        Tuple<HashMap<String, ArrayList<Tuple<Integer,Integer>>>,HashMap<Integer,Integer>> temp = 
+        		checker.getNearVampiresSCount();
+        HashMap<Integer,Integer> sentCount = temp.y;
+        nameIndex = temp.x;        
 
 //        //Let's print all the crap!
 //        System.out.println("\n\n NOW WE HAVE ANAPHORIZED..... \n\n");
