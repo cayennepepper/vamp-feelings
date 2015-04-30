@@ -74,6 +74,7 @@ public class VampireChecker {
 	        	//Get the sentence number. If not near vampire, remove index both from NER hashmap
 	        	//and from sentence number hashmap.
 	        	Integer sentenceIndex = indexToSentenceNum.get(toCheck.toString());
+	        	System.out.print("Sentence we are checking for vampires...." + sentenceIndex);
 	        	if(!isNearVampire(sentenceIndex)){
 	        		indMenIt.remove();
 	        		//TODO INVESTIGATE PROBLEMS WITH THIS
@@ -118,8 +119,10 @@ public class VampireChecker {
 	//This does the checking to see whether a word is within sentence containing "vampire"
 	//May want to make it check the surrounding two sentences also
 	public boolean isNearVampire(Integer sentenceIndex){
+//		System.out.println("In isNearVampire, sentence we are checking is: " + sentenceIndex);
 		//get sentence tokens and iterate
 		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
+//		System.out.println("Size of sentences in VampireChecker..." + sentences.size());
 		CoreMap sentence = sentences.get(sentenceIndex);
 		for (CoreLabel token: sentence.get(TokensAnnotation.class)){
 			String tokString = token.value().toLowerCase();
@@ -127,6 +130,7 @@ public class VampireChecker {
 					tokString.equalsIgnoreCase("vampires") ||
 					tokString.equalsIgnoreCase("vampyre") ||
 					tokString.equalsIgnoreCase("vampyres")){
+				System.out.println("and it includes vampires: " + sentence.toString());
 				return true;
 			}
 		}

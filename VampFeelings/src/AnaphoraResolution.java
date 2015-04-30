@@ -124,10 +124,7 @@ public class AnaphoraResolution {
                 Tuple<Integer,Integer> senTuple = new Tuple<Integer,Integer>(bIndex,eIndex);
                 indexToSentenceNum.put(senTuple.toString(), sNum);
                 
-//                if(m.toString().contains("Denise")){
-//                  System.out.println("MMMMMMMMMMMention: " + m.toString() + " with indices: " + bIndex + "," + eIndex);
-//                  System.out.println("Denise sentence Number: " + sNum);
-//                }
+
             }
             if(thereIsVampMention){
 //            	System.out.println("Vampire is mentioned!");
@@ -162,14 +159,14 @@ public class AnaphoraResolution {
         		String person = indexToName.get(pruneTup.toString());
         		indexSet.remove(ind); //Get rid of repeat mention
 				ArrayList<Tuple<Integer, Integer>> tempList = nameIndex.get(person); //get already existing
-        		if(person.equals("Denise")){
-        			System.out.println("HOLA DENISE IS FOUND");
-        			for(Tuple<Integer,Integer> t : tempList){
-        				System.out.println("Denise Index: " + t);
-        				Integer sentN = indexToSentenceNum.get(t.toString());
-        				System.out.println("Sentence number is: " + sentN);
-        			}
-        		}
+//        		if(person.equals("Denise")){
+//        			System.out.println("HOLA DENISE IS FOUND");
+//        			for(Tuple<Integer,Integer> t : tempList){
+//        				System.out.println("Denise Index: " + t);
+//        				Integer sentN = indexToSentenceNum.get(t.toString());
+//        				System.out.println("Sentence number is: " + sentN);
+//        			}
+//        		}
 				//Get the arraylist of tuple< tuple<beginIndex, endIndex>, sentenceNum and strip the indices.
 				//Those indices get put into nameIndex.
 				//Place the sentence numbers into indexToSentenceNum.

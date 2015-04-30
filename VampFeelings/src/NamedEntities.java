@@ -61,6 +61,7 @@ public class NamedEntities {
 		Integer endIndex = 0;
 		// A CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 		List<CoreMap> sentences = doc.get(SentencesAnnotation.class);
+		System.out.println("The size of all the sentences: " + sentences.size());
 	    for(CoreMap sentence: sentences) {
 //	    	sentenceNum = sentence.
 	    	// Traversing the words in the current sentence
@@ -113,10 +114,9 @@ public class NamedEntities {
 	    		} else {
 	    			//name is not in progress. Do nothing
 	    		}
-
-	        		
 	    	}
-	       
+	        sentenceNum++;
+	        System.out.println("Sentence Number: " + sentenceNum);
 	    }
 	    
 	    return new Tuple((new Tuple(nameIndex, indexToName)), nameToSentence);
