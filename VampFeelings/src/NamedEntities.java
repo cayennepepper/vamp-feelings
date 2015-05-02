@@ -82,10 +82,6 @@ public class NamedEntities {
 	    		} else if(isBuildingName) { //and it's NOT a person
 	    			endIndex = token.get(CharacterOffsetEndAnnotation.class);
 	    			//Insert into name->index hashmap
-	    			if(nameInProgress.equals("Denise")){
-	    				System.out.println("Found Denise in NER!");
-	    				
-	    			}
 	    			if(nameIndex.containsKey(nameInProgress)) {
 	    				ArrayList<Tuple<Integer, Integer>> tempList = nameIndex.get(nameInProgress);
 	    				tempList.add(new Tuple(beginIndex, endIndex));
@@ -108,7 +104,7 @@ public class NamedEntities {
 	    			endIndToBegin.put(endIndex, beginIndex);
 	    			
 	    			//Reset isbuilding and string
-	    			System.out.println("New person: " + nameInProgress + " Indices: " + beginIndex + "," + endIndex);
+//	    			System.out.println("New person: " + nameInProgress + " Indices: " + beginIndex + "," + endIndex);
 	    			nameInProgress = "";
 	    			isBuildingName = false;
 	    		} else {
@@ -116,7 +112,6 @@ public class NamedEntities {
 	    		}
 	    	}
 	        sentenceNum++;
-	        System.out.println("Sentence Number: " + sentenceNum);
 	    }
 	    
 	    return new Tuple((new Tuple(nameIndex, indexToName)), nameToSentence);

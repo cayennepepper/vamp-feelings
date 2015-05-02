@@ -74,7 +74,6 @@ public class VampireChecker {
 	        	//Get the sentence number. If not near vampire, remove index both from NER hashmap
 	        	//and from sentence number hashmap.
 	        	Integer sentenceIndex = indexToSentenceNum.get(toCheck.toString());
-	        	System.out.print("Sentence we are checking for vampires...." + sentenceIndex);
 	        	if(!isNearVampire(sentenceIndex)){
 	        		indMenIt.remove();
 	        		//TODO INVESTIGATE PROBLEMS WITH THIS
@@ -130,7 +129,6 @@ public class VampireChecker {
 					tokString.equalsIgnoreCase("vampires") ||
 					tokString.equalsIgnoreCase("vampyre") ||
 					tokString.equalsIgnoreCase("vampyres")){
-				System.out.println("and it includes vampires: " + sentence.toString());
 				return true;
 			}
 		}

@@ -39,6 +39,10 @@ public class EmotionLookup {
 		this.doc = d;
 	}
 	
+	public EmotionLookup(){
+		this.nrcLex = new HashMap<String,String>();
+	}
+	
 	/*
 	 * Places lexicon into hashmap.
 	 */
@@ -75,6 +79,37 @@ public class EmotionLookup {
 			}
 		}
 		
+	}
+	
+	public HashMap<String,Integer> HashTopicLists(ArrayList<ArrayList<String>> topicLists){
+		HashMap<String,Integer> emotionMap = new HashMap<String,Integer>(){{
+			put("0", 0);
+			put("1", 0);
+			put("2", 0);
+			put("3", 0);
+			put("4", 0);
+			put("5", 0);
+			put("6", 0);
+			put("7", 0);
+			put("8", 0);
+			put("9", 0);
+		}};
+		
+		
+		for(ArrayList<String> topicList: topicLists){
+			for(String wd : topicList){
+				if(nrcLex.containsKey(wd)){
+	            	String emotionBlock = nrcLex.get(wd);
+	            	for(int j = 0; j<10; j++){
+	            		String mapIndex = "" + j;
+	            		Integer prevCount = emotionMap.get(mapIndex);
+	            		Integer plusCount = Character.getNumericValue(emotionBlock.charAt(j));
+	            		emotionMap.put(mapIndex, prevCount+plusCount);
+	            	}
+				}
+			}
+		}
+		return emotionMap;
 	}
 	
 	public HashMap<String,Integer> checkSentences(){
@@ -114,11 +149,9 @@ public class EmotionLookup {
 	        Integer sCount = pair.getValue();
 	        CoreMap sentence = sentences.get(sIndex);
 	        for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
-//	            String word = (token.get(TextAnnotation.class)).toLowerCase();
 	            String word = (token.get(LemmaAnnotation.class));
 	            if(nrcLex.containsKey(word)){
 	            	tally++;
-//	            	System.out.println("A word we looked up: " + word);
 	            	String emotionBlock = nrcLex.get(word);
 	            	for(int j = 0; j<10; j++){
 	            		String mapIndex = "" + j;
